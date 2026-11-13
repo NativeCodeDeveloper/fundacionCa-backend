@@ -788,17 +788,14 @@ export default class NotificacionAgendamientoController {
       }
 
       let estadoReserva;
-      let mensajePaciente;
       let accionEquipo;
 
       if (accion === "CONFIRMAR_RESERVA") {
         estadoReserva = "CONFIRMADA";
         accionEquipo = "CONFIRMADA";
-        mensajePaciente = `Tu cita del ${String(reserva.fechaInicio).slice(0, 10)} a las ${reserva.horaInicio} ha sido confirmada correctamente.`;
       } else if (accion === "CANCELAR_RESERVA") {
         estadoReserva = "ANULADA";
         accionEquipo = "CANCELADA";
-        mensajePaciente = `Tu cita del ${String(reserva.fechaInicio).slice(0, 10)} a las ${reserva.horaInicio} ha sido anulada correctamente.`;
       } else {
         console.warn("[WSP-INBOUND] Acción no soportada:", accion);
         return res.status(200).send("OK");
@@ -828,11 +825,6 @@ export default class NotificacionAgendamientoController {
       } catch (errorCorreo) {
         console.error("[WSP-INBOUND] Error notificando al equipo:", errorCorreo);
       }
-
-      await enviarMensajeTextoWhatsApp({
-        telefono: reserva.telefono || From,
-        mensaje: mensajePaciente
-      });
 
       return res.status(200).send("OK");
     } catch (error) {

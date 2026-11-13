@@ -251,18 +251,21 @@ export default class ReservaPacienteController {
                     console.error("[MAIL EQUIPO] Error actualización:", err.message);
                 });
 
-                notificacionActualizacionAgendamiento({
-                    telefono,
-                    nombre: nombrePaciente,
-                    nombreProfesional : nombreProfesional,
-                    motivo_reserva : motivo_reserva,
-                    apellido: apellidoPaciente,
-                    fecha: fechaInicio,
-                    hora: horaInicio,
-                    id_reserva
-                }).catch(err => {
-                    console.error("[WSP] Error actualización:", err.message);
-                });
+                const estadoNormalizado = String(estadoReserva || '').trim().toLowerCase();
+                if (!['confirmada', 'confirmado', 'finalizada', 'finalizado', 'anulada', 'anulado'].includes(estadoNormalizado)) {
+                    notificacionActualizacionAgendamiento({
+                        telefono,
+                        nombre: nombrePaciente,
+                        nombreProfesional : nombreProfesional,
+                        motivo_reserva : motivo_reserva,
+                        apellido: apellidoPaciente,
+                        fecha: fechaInicio,
+                        hora: horaInicio,
+                        id_reserva
+                    }).catch(err => {
+                        console.error("[WSP] Error actualización:", err.message);
+                    });
+                }
 
 
                 const claseProfesionales = new Profesionales();
