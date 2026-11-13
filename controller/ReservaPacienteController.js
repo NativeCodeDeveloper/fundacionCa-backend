@@ -1,7 +1,7 @@
 import ReservaPacientes from "../model/ReservaPacientes.js";
 import Pacientes from "../model/Pacientes.js";
 import NotificacionAgendamiento from "../services/notificacionAgendamiento.js";
-import { notificacionAgendamiento, notificacionActualizacionAgendamiento } from "../services/notificacionWhatsApp.js";
+import { notificacionActualizacionAgendamiento } from "../services/notificacionWhatsApp.js";
 import enviarCorreoProfesionales from "../services/correoNotificacionProfesionales.js";
 import Profesionales from "../model/Profesionales.js";
 import enviarCorreoProfesionalesActualizacion from "../services/correoActualizacionProfesional.js";
@@ -451,19 +451,6 @@ export default class ReservaPacienteController {
                     console.error("[MAIL EQUIPO] Error:", err.message);
                 });
 
-                notificacionAgendamiento({
-                    telefono,
-                    nombre: nombrePaciente,
-                    apellido: apellidoPaciente,
-                    nombreProfesional : nombreProfesional,
-                    motivo_reserva : motivo_reserva,
-                    fecha: fechaInicio,
-                    hora: horaInicio,
-                    id_reserva: resultadoQuery.insertId
-                }).catch(err => {
-                    console.error("[WSP] Error:", err.message);
-                });
-
                 const claseProfesionales = new Profesionales();
                 const correoEnArray = await claseProfesionales.seleccionarCorreoEspecificoPorProfesional(id_profesional);
                 const correoDelProfesional = correoEnArray[0].correoContacto;
@@ -578,17 +565,6 @@ export default class ReservaPacienteController {
                     id_reserva: resultadoQuery.insertId
                 }).catch(err => {
                     console.error("[MAIL EQUIPO] Error:", err.message);
-                });
-
-                notificacionAgendamiento({
-                    telefono,
-                    nombre: nombrePaciente,
-                    apellido: apellidoPaciente,
-                    fecha: fechaInicio,
-                    hora: horaInicio,
-                    id_reserva: resultadoQuery.insertId
-                }).catch(err => {
-                    console.error("[WSP] Error:", err.message);
                 });
 
 

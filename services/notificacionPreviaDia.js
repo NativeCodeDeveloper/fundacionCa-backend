@@ -1,5 +1,5 @@
 import DataBase from '../config/Database.js';
-import { enviarRecordatorio_1hora } from './notificacionWhatsApp.js';
+import { enviarRecordatorio_1hora, notificacionAgendamiento } from './notificacionWhatsApp.js';
 import { obtenerDatosEmpresaConfig } from './datosEmpresaConfig.js';
 import { sendPushToAll } from './pushService.js';
 import { construirCorreoBase, construirTablaDetalle, construirAviso, TEXTO_PRINCIPAL, TEXTO_SECUNDARIO, formatearHoraCorreo } from './emailTemplateBase.js';
@@ -13,9 +13,8 @@ import { construirCorreoBase, construirTablaDetalle, construirAviso, TEXTO_PRINC
  *
  * Envía recordatorios por WhatsApp:
  * - 12 horas antes de la cita
- * - 6 horas antes de la cita
  * - 1 hora antes de la cita
- *
+ * ll
  * Envía recordatorios push/in-app (campana del dashboard) al profesional:
  * - 12 horas antes de la cita
  * - 6 horas antes de la cita
@@ -208,6 +207,7 @@ let columnasPushDisponibles = true;
 const CAMPOS_BASE = `
         id_reserva,
         id_profesional,
+        (SELECT profesionales.nombreProfesional FROM profesionales WHERE profesionales.id_profesional = reservaPacientes.id_profesional) AS nombreProfesional,
         nombrePaciente,
         apellidoPaciente,
         email,
@@ -304,7 +304,7 @@ function fechaISOCorta(fecha) {
  *
  * Revisa todas las reservas próximas y envía recordatorios:
  * - 12 horas antes: email + WhatsApp (690-750 minutos)
- * - 6 horas antes: email + WhatsApp (330-390 minutos)
+ * - 6 horas antes: email (330-390 minutos)
  * - 1 hora antes: WhatsApp (30-90 minutos)
  */
 // Evita que dos corridas del cron se solapen si una demora más de 5 minutos
@@ -349,6 +349,7 @@ async function ejecutarRecordatoriosAutomaticosInterno() {
             const {
                 id_reserva,
                 id_profesional,
+                nombreProfesional,
                 nombrePaciente,
                 apellidoPaciente,
                 email,
@@ -390,6 +391,21 @@ async function ejecutarRecordatoriosAutomaticosInterno() {
 
             // ===== RECORDATORIOS DE 12 HORAS (entre 690 y 750 minutos = 11.5h a 12.5h) =====
             if (minutos_restantes >= 690 && minutos_restantes <= 750) {
+                if (!wspRecordatorio12h) {
+                    const enviado = await notificacionAgendamiento({
+                        telefono,
+                        nombre: nombrePaciente,
+                        apellido: apellidoPaciente,
+                        nombreProfesional,
+                        motivo_reserva,
+                        fecha: fechaISOCorta(fechaInicio),
+                        hora: horaInicio,
+                        id_reserva
+                    });
+                    if (enviado) { await marcarRecordatorioWhatsAppEnviado(id_reserva, '12h'); enviados++; }
+                    else { errores++; }
+                }
+
                 // Email 12h
                 if (!recordatorio12h) {
                     console.log(`[RECORDATORIO] Enviando correo de 12h a ${email}...`);

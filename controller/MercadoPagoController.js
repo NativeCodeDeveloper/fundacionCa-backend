@@ -3,7 +3,6 @@ import ReservaPacientes from "../model/ReservaPacientes.js";
 import Pacientes from "../model/Pacientes.js";
 import NotificacionAgendamiento from "../services/notificacionAgendamiento.js";
 import * as mpNamed from "mercadopago";
-import { notificacionAgendamiento, notificacionActualizacionAgendamiento } from "../services/notificacionWhatsApp.js";
 import MercadoPersistence from "../model/MercadoPersisntence.js"
 import Profesionales from "../model/Profesionales.js";
 
@@ -341,29 +340,6 @@ export const recibirPago = async (req, res) => {
                         }
 
 
-
-
-                        try {
-
-                            console.log(`############################`);
-                            console.log(`Enviando wsp de confirmación para el TELEFONO: ${reserva.telefono}`);
-                            console.log(`############################`);
-
-                            await notificacionAgendamiento({
-                                telefono: reserva.telefono,
-                                nombre: reserva.nombrePaciente,
-                                apellido: reserva.apellidoPaciente,
-                                nombreProfesional : reserva.nombreProfesional,
-                                motivo_reserva : reserva.motivo_reserva,
-                                fecha: normalizarFechaISO(reserva.fechaInicio).toString(),
-                                hora: normalizarHoraISO(reserva.horaInicio).toString(),
-                                id_reserva: reserva.id_reserva
-                            })
-
-                        }catch{
-                            console.log(`Error al procesar envio de whatsapp para ${reserva.telefono}`);
-                            return res.status(500).json({ received: false });
-                        }
 
 
                         try {
