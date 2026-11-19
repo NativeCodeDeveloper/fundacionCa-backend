@@ -146,7 +146,6 @@ function construirHtmlCorreoPaciente({
     fechaFinalizacion,
     horaFinalizacion,
     motivo_reserva,
-    monto_reserva,
     estadoReserva,
     ctaTitulo,
     ctaTexto,
@@ -154,6 +153,8 @@ function construirHtmlCorreoPaciente({
     urlCancelar,
     fromName
 }) {
+    // El monto de la atención no se muestra a propósito: los correos al paciente
+    // no deben incluir el valor de la atención (solo el correo interno al equipo lo muestra).
     const tabla = construirTablaDetalle([
         { label: "Paciente", value: normalizarTextoCorreo(nombrePaciente) },
         { label: "Profesional", value: normalizarTextoCorreo(nombreProfesional) },
@@ -162,7 +163,6 @@ function construirHtmlCorreoPaciente({
         { label: "Inicio", value: `${normalizarTextoCorreo(fechaInicio)} ${normalizarTextoCorreo(horaInicio)}` },
         { label: "Término", value: `${normalizarTextoCorreo(fechaFinalizacion)} ${normalizarTextoCorreo(horaFinalizacion)}` },
         { label: "Motivo", value: normalizarTextoCorreo(motivo_reserva) },
-        { label: "Monto", value: `$${formatearMontoCorreo(monto_reserva)}` },
         { label: "Estado", value: normalizarTextoCorreo(estadoReserva) }
     ]);
 
@@ -305,7 +305,6 @@ export default class NotificacionAgendamiento {
             `• Inicio: ${fechaInicio} ${horaInicio}\n` +
             `• Término: ${fechaFinalizacion} ${horaFinalizacion}\n` +
             `• Motivo: ${motivo_reserva}\n` +
-            `• Monto: $${monto_reserva}\n` +
             `• Estado: ${estadoReserva}\n\n` +
             `Te pedimos confirmar tu asistencia con la nueva fecha/hora usando los enlaces de este correo.\n` +
             `Si no puedes asistir, por favor cancela con anticipación.\n\n` +
@@ -325,7 +324,6 @@ export default class NotificacionAgendamiento {
             fechaFinalizacion,
             horaFinalizacion,
             motivo_reserva,
-            monto_reserva,
             estadoReserva,
             ctaTitulo: "Confirma el horario actualizado",
             ctaTexto: "tu reserva fue modificada y ya se encuentra actualizada en nuestro sistema.",
@@ -454,7 +452,6 @@ export default class NotificacionAgendamiento {
             `• Inicio: ${fechaInicio} ${horaInicio}\n` +
             `• Término: ${fechaFinalizacion} ${horaFinalizacion}\n` +
             `• Motivo: ${motivo_reserva}\n` +
-            `• Monto: $${monto_reserva}\n` +
             `• Estado: ${estadoReserva}\n\n` +
             `Te recordamos confirmar tu cita a través de los enlaces de este correo.\n` +
             `En caso de no poder asistir, te pedimos cancelarla con anticipación para poder reasignar ese horario a otro paciente.\n` +
@@ -475,7 +472,6 @@ export default class NotificacionAgendamiento {
             fechaFinalizacion,
             horaFinalizacion,
             motivo_reserva,
-            monto_reserva,
             estadoReserva,
             ctaTitulo: "Gestiona tu asistencia",
             ctaTexto: "tu reserva fue registrada exitosamente en nuestra agenda.",
